@@ -1,15 +1,25 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search } from 'lucide-react';
 import { Sidebar } from '@/components/Sidebar';
 import { Navbar } from '@/components/Navbar';
 import { EmployeeCard } from '@/components/EmployeeCard';
 import { Input } from '@/components/ui/input';
-import { mockEmployees } from '@/data/mockData';
+import { getData } from "../api/api";
 
 const Employees = () => {
+  const [employees, setEmployees] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [error, setError] = useState('');
 
-  const filteredEmployees = mockEmployees.filter((employee) =>
+  // Load employees from backend on mount
+  useEffect(() => {
+    getData("employees")
+      .then(setEmployees)
+      .catch(err => setError(err.message));
+  }, []);
+
+  // Search among Fetched Employees
+  const filteredEmployees = employees.filter((employee: any) =>
     employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     employee.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
     employee.email.toLowerCase().includes(searchQuery.toLowerCase())
@@ -29,12 +39,12 @@ const Employees = () => {
                 placeholder="Search..."
                 className="pl-10"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={e => setSearchQuery(e.target.value)}
               />
             </div>
-
+            {error && <div style={{color: 'red'}}>Error: {error}</div>}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredEmployees.map((employee) => (
+              {filteredEmployees.map((employee: any) => (
                 <EmployeeCard key={employee.id} employee={employee} />
               ))}
             </div>

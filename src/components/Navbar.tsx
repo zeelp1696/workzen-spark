@@ -21,12 +21,42 @@ export const Navbar = () => {
     navigate('/login');
   };
 
+   const showPayrollTabs = location.pathname === "/payroll";
   return (
     <header className="h-16 bg-card border-b border-border flex items-center justify-between px-6">
       <div className="flex items-center gap-2">
-        <h1 className="text-lg font-semibold text-foreground">Company Name & Logo</h1>
       </div>
-
+    <button
+          className={`px-4 py-2 rounded-t-md font-semibold ${
+            location.pathname === "/dashboard" ? "bg-accent text-primary" : "text-muted-foreground"
+          }`}
+          onClick={() => navigate("/dashboard")}
+        >
+          Dashboard
+        </button>
+        
+        <div className="flex space-x-4">
+        {showPayrollTabs && (
+          <>
+            <button
+              className={`px-4 py-2 rounded-t-md font-semibold ${
+                location.pathname === "/dashboard" ? "bg-accent text-primary" : "text-muted-foreground"
+              }`}
+              onClick={() => navigate("/dashboard")}
+            >
+              Dashboard
+            </button>
+            <button
+              className={`px-4 py-2 rounded-t-md font-semibold ${
+                location.pathname === "/payroll" ? "bg-accent text-primary" : "text-muted-foreground"
+              }`}
+              onClick={() => navigate("/payroll")}
+            >
+              Payrun
+            </button>
+          </>
+        )}
+      </div>
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />

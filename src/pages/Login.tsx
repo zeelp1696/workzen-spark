@@ -1,17 +1,23 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 
+// Role/password config: You can set these as needed
+const credentials = {
+  admin: { password: "admin123", role: "admin" },
+  hr: { password: "hr123", role: "hr" },
+  employee: { password: "employee123", role: "employee" },
+  payroll: { password: "payroll123", role: "payroll" }
+};
+
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -19,22 +25,25 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      await login(email, password);
+    // Use username as the identifier (not email!)
+    if (credentials[username] && credentials[username].password === password) {
+      // Save role and username to localStorage
+      localStorage.setItem("userRole", credentials[username].role);
+      localStorage.setItem("username", username);
+
       toast({
         title: 'Login successful',
         description: 'Welcome to WorkZen HRMS',
       });
       navigate('/employees');
-    } catch (error) {
+    } else {
       toast({
         title: 'Login failed',
         description: 'Please check your credentials and try again.',
         variant: 'destructive',
       });
-    } finally {
-      setIsLoading(false);
     }
+    setIsLoading(false);
   };
 
   return (
@@ -43,19 +52,25 @@ const Login = () => {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">WorkZen HRMS</CardTitle>
           <CardDescription className="text-center">
-            Sign in to your account to continue
+            Sign in to your account to continue<br />
+            <span style={{fontSize:'0.8em'}}>Login as:<br/>
+              admin/admin123<br/>
+              hr/hr123<br/>
+              employee/employee123<br/>
+              payroll/payroll123
+            </span>
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="username">Username</Label>
               <Input
-                id="email"
-                type="email"
-                placeholder="you@company.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="username"
+                type="text"
+                placeholder="e.g. admin"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </div>
